@@ -42,8 +42,26 @@ goodwill formula and the number formatting.
 
 ## Change the look
 
-Paper on a desk: an engraved brass nameplate, the balance clipped to a slip
-with a FILED stamp, and every hire its own slip with a brass icon tab.
+Paper on a desk: an engraved nameplate, the balance clipped to a slip with a
+FILED stamp, and every hire its own slip with a gold icon tab. Pale sky and
+lemon by day, navy and gold by night — the paper stays paper in both.
+
+Every text pair was checked with a real contrast calculation, not by eye.
+The worst pair in either theme is 4.5:1, which is the point of a game you
+are meant to leave open for an hour.
+
+## It moves
+
+A list that never reacts reads as a form, not a game. So: the balance eases
+up to its new value instead of snapping, filing throws the amount off the
+button, the FILED stamp presses when you tap, a bought slip flashes, a newly
+unlocked hire slides in, a bar under the staff shows what you are saving up
+for, and a ticker prints what the office is actually doing — only ever
+naming staff you really employ.
+
+All of it is off under `prefers-reduced-motion`, and the floating amounts
+clean themselves up on a timer as well as on animation end, because an
+animation that never runs never fires its end event.
 
 `:root` holds the tokens, `:root[data-theme="dark"]` overrides them. Only the
 desk changes between themes — paper stays paper, brass stays brass. The ◐

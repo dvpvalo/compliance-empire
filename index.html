@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Compliance Empire</title>
-<meta name="theme-color" content="#1b130c">
+<meta name="theme-color" content="#d5e9f5">
 <meta name="color-scheme" content="light dark">
 <script>
   (function () {
@@ -19,30 +19,42 @@
 <style>
   /* Paper on a desk. Only the desk changes between themes — paper stays paper. */
   :root {
-    --desk: #d6c4a2;
-    --grain: rgba(0,0,0,.06);
-    --desk-fg: #2e2519;
-    --desk-muted: #6b5d46;
-    --slip: #fbf7ec;
-    --slip-fg: #221c14;
-    --slip-muted: #6d6353;
-    --brass: #d9b03c;
-    --brass-hi: #f0cf6b;
-    --brass-lo: #a47c1c;
-    --brass-deep: #7d5d12;
-    --brass-fg: #1a1204;
-    --stamp: #b3261e;
-    --lift: rgba(70,52,28,.34);
+    --desk: #d5e9f5;
+    --grain: rgba(0,0,0,.035);
+    --desk-fg: #12222c;
+    --desk-muted: #46606f;
+    --slip: #fffef8;
+    --slip-fg: #14222b;
+    --slip-muted: #5a6a75;
+    --brass: #f7cf4a;
+    --brass-hi: #ffe796;
+    --brass-lo: #cfa413;
+    --brass-deep: #96760a;
+    --brass-fg: #2a2102;
+    --accent-text: #6f5607;
+    --ink-accent: #8a6c09;
+    --stamp: #c2385f;
+    --lift: rgba(55,70,80,.20);
     --radius: 10px;
     --display: "Special Elite", "Courier Prime", ui-monospace, monospace;
     --body: "Courier Prime", ui-monospace, "Courier New", monospace;
   }
   :root[data-theme="dark"] {
-    --desk: #1b130c;
-    --grain: rgba(0,0,0,.24);
-    --desk-fg: #f4efe2;
-    --desk-muted: #a08f74;
-    --slip: #efe7d3;
+    --desk: #111a2e;
+    --grain: rgba(0,0,0,.22);
+    --desk-fg: #eef1f7;
+    --desk-muted: #95a2bd;
+    --slip: #f6f3e9;
+    --slip-fg: #1a1d24;
+    --slip-muted: #636976;
+    --brass: #dcc05c;
+    --brass-hi: #f2dc8e;
+    --brass-lo: #a98c2b;
+    --brass-deep: #6e5a14;
+    --brass-fg: #17140a;
+    --accent-text: #ecd88f;
+    --ink-accent: #8a7420;
+    --stamp: #b3261e;
     --lift: rgba(0,0,0,.5);
   }
   * { box-sizing: border-box; }
@@ -76,7 +88,7 @@
   #themeBtn { font-size: 16px; }
 
   /* ---- the balance, clipped to the desk ---- */
-  .bank { padding: 18px 16px 0; }
+  .bank { position: relative; padding: 18px 16px 0; }
   .slip {
     position: relative; background: var(--slip); color: var(--slip-fg);
     border-radius: 3px; padding: 16px 18px;
@@ -150,7 +162,7 @@
   .chip svg { width: 21px; height: 21px; }
   .row .grow { display: block; flex-grow: 1; min-width: 0; }
   .row .name { display: block; font-size: 13px; font-weight: 700; }
-  .row .name b { color: var(--brass-lo); }
+  .row .name b { color: var(--ink-accent); }
   .row .desc { display: block; font-size: 10px; color: var(--slip-muted); margin-top: 2px; line-height: 1.4; }
   .row .num { display: block; text-align: right; flex: none; }
   .row .cost { display: block; font-family: var(--display); font-size: 15px; white-space: nowrap; }
@@ -179,8 +191,47 @@
   }
   #mergeBtn:disabled { opacity: .45; cursor: default; border-color: var(--desk-muted); }
   footer .stats { font-size: 10.5px; color: var(--desk-muted); line-height: 1.6; }
-  footer .stats b { color: var(--brass); }
+  footer .stats b { color: var(--accent-text); }
   #wipeBtn { background: none; border: 0; cursor: pointer; }
+
+  /* the money you just made, leaving the button */
+  @keyframes floatUp {
+    from { opacity: 1; transform: translate(-50%, 0) scale(.9); }
+    20%  { opacity: 1; transform: translate(-50%, -14px) scale(1.1); }
+    to   { opacity: 0; transform: translate(-50%, -78px) scale(1.05); }
+  }
+  .pop {
+    position: absolute; left: 50%; bottom: 76px; z-index: 5; pointer-events: none;
+    font-family: var(--display); font-size: 18px; color: var(--accent-text);
+    animation: floatUp 950ms cubic-bezier(.2,.7,.3,1) forwards;
+  }
+  .stamp { transition: transform 110ms ease-out; }
+  .stamp.hit { transform: rotate(-12deg) scale(.86); }
+
+  @keyframes flash { from { background: var(--brass-hi); } to { background: var(--slip); } }
+  .row.bought { animation: flash 520ms ease-out; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .rowwrap.fresh { animation: slideIn 340ms ease-out; }
+  .row.has { box-shadow: inset 3px 0 0 var(--brass), 0 5px 12px var(--lift); }
+
+  /* what the office is doing while you watch */
+  #ticker {
+    margin: 12px 16px 0; min-height: 17px; font-size: 11px; color: var(--desk-muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #ticker span { display: inline-block; animation: slideIn 300ms ease-out; }
+  #ticker b { color: var(--accent-text); font-weight: 400; }
+
+  /* the next hire, so you can see it coming */
+  .teaser { display: flex; align-items: center; gap: 10px; padding: 4px 2px 2px; font-size: 11px; color: var(--desk-muted); }
+  .teaser .bar { flex-grow: 1; height: 5px; border-radius: 99px; background: var(--lift); overflow: hidden; }
+  .teaser .bar i { display: block; height: 100%; background: var(--brass); transition: width 200ms linear; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pop, .row.bought, .rowwrap.fresh, #ticker span { animation: none; }
+    .stamp, .teaser .bar i { transition: none; }
+    .pop { opacity: 0; }
+  }
 
   #toast {
     position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
@@ -236,6 +287,7 @@
       <text x="50" y="63" text-anchor="middle" font-family="Special Elite, cursive" font-size="10" fill="currentColor" stroke="none">CE-1</text>
     </svg>
   </div>
+  <div id="pops"></div>
   <button id="fileBtn" type="button">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M8 3h8v5H8z"></path><path d="M6 8h12l1 5H5z"></path><path d="M4 16h16v4H4z"></path>
@@ -243,6 +295,8 @@
     <span>File a return <small id="perClick">+&#8377;1</small></span>
   </button>
 </section>
+
+<div id="ticker" aria-hidden="true"></div>
 
 <main>
   <section class="panel">
@@ -254,6 +308,7 @@
       </span>
     </h2>
     <div id="gens"></div>
+    <div class="teaser" id="teaser"><span id="tname"></span><span class="bar"><i id="tbar"></i></span><span id="tcost"></span></div>
   </section>
   <section class="panel">
     <h2>Upgrades</h2>
@@ -330,6 +385,17 @@ const UPGRADES = [
   { id: "a2", name: "Named in the press", desc: "Everything earns double.",           cost: 60000000,   target: "all",     need: ["partner", 5],  mult: 2 }
 ];
 
+/* What each hire is heard doing. Only staff you actually employ speak up. */
+const CHATTER = {
+  clerk: ["filed a DIR-3 KYC", "fetched the wrong file, twice", "asked where the stamp went", "queued fourteen forms"],
+  para: ["cleared a name application", "caught a missing signature", "closed off a ledger"],
+  cs: ["signed a board resolution", "certified an annual return", "minuted a meeting nobody attended"],
+  branch: ["couriered a packet to the registrar", "opened at nine sharp"],
+  soft: ["uploaded a batch of sixty", "timed out, retried, succeeded"],
+  partner: ["landed a retainer over lunch", "promised a deadline you must now meet"],
+  cal: ["filed everything due tomorrow", "was up before you were"]
+};
+
 /* Indian units all the way up. Arab is 10^9, and it keeps going from there. */
 const UNITS = [[1e17, "Shankh"], [1e15, "Padma"], [1e13, "Neel"], [1e11, "Kharab"],
                [1e9, "Arab"], [1e7, "Cr"], [1e5, "L"], [1e3, "K"]];
@@ -378,6 +444,8 @@ const fresh = () => ({
 let state = fresh();
 let buyMode = "1";
 let armed = null;
+let shown = 0;                 /* the balance eases toward state.money instead of snapping */
+const calm = matchMedia("(prefers-reduced-motion: reduce)");
 
 function multFor(target) {
   let m = 1;
@@ -439,19 +507,57 @@ function toast(msg, ms = 2600) {
 const rows = {};
 let shownGens = "", shownUps = "";
 
+function popMoney(text) {
+  if (calm.matches || popsEl.childElementCount > 10) return;
+  const el = document.createElement("div");
+  el.className = "pop";
+  el.textContent = text;
+  el.addEventListener("animationend", () => el.remove());
+  setTimeout(() => el.remove(), 1400);   /* animationend can never come; never leak */
+  popsEl.appendChild(el);
+}
+
+function pressStamp() {
+  if (calm.matches) return;
+  stampEl.classList.add("hit");
+  clearTimeout(pressStamp.t);
+  pressStamp.t = setTimeout(() => stampEl.classList.remove("hit"), 110);
+}
+
+function flash(el) {
+  if (calm.matches || !el) return;
+  el.classList.remove("bought");
+  void el.offsetWidth;                /* restart the animation on a repeat purchase */
+  el.classList.add("bought");
+}
+
+/* One line of office noise, from someone you actually employ. */
+function chatter() {
+  const staffed = GENS.filter(g => (state.owned[g.id] || 0) > 0);
+  if (!staffed.length) return;
+  const g = staffed[Math.floor(Math.random() * staffed.length)];
+  const lines = CHATTER[g.id];
+  tickerEl.innerHTML = "";
+  const line = document.createElement("span");
+  line.innerHTML = "<b>" + g.name + "</b> " + lines[Math.floor(Math.random() * lines.length)];
+  tickerEl.appendChild(line);
+}
+
 function buildLists() {
   const gens = GENS.filter(unlocked);
   const ups = UPGRADES.filter(upAvailable);
   const gKey = gens.map(g => g.id).join(),
         uKey = ups.map(u => u.id).join();
   if (gKey === shownGens && uKey === shownUps) return;
+  const shownGensBefore = shownGens;
   shownGens = gKey;
   shownUps = uKey;
 
+  const seen = shownGensBefore ? shownGensBefore.split(",") : [];
   gensEl.innerHTML = "";
   for (const g of gens) {
     const wrap = document.createElement("div");
-    wrap.className = "rowwrap";
+    wrap.className = "rowwrap" + (seen.length && !seen.includes(g.id) ? " fresh" : "");
 
     const b = document.createElement("button");
     b.type = "button";
@@ -498,7 +604,9 @@ function buildLists() {
 }
 
 function paint() {
-  moneyEl.textContent = fmt(state.money);
+  const gap = state.money - shown;
+  shown = Math.abs(gap) < 0.5 || calm.matches ? state.money : shown + gap * 0.28;
+  moneyEl.textContent = fmt(shown);
   rateEl.textContent = rupees(income()) + " per second";
   perClickEl.textContent = "+" + rupees(clickValue());
 
@@ -513,6 +621,7 @@ function paint() {
     row._cost.textContent = rupees(cost) + (count > 1 ? " · " + count : "");
     row._each.textContent = "+" + fmt(g.rate * multFor(g.id) * multFor("all") * prestigeMult()) + "/s each";
     row.disabled = state.money < cost;
+    row.classList.toggle("has", owned > 0);
 
     const auto = rows[g.id + ":auto"];
     const hired = !!state.managers[g.id];
@@ -529,6 +638,14 @@ function paint() {
     const row = rows[u.id];
     if (row && upAvailable(u)) row.disabled = state.money < u.cost;
   }
+
+  /* Always show the thing you are saving up for, with a bar that fills. */
+  const next = GENS.find(g => !unlocked(g));
+  const target = next ? GENS[GENS.indexOf(next) - 1] : GENS[GENS.length - 1];
+  const targetCost = bulkCost(target.cost, state.owned[target.id] || 0, 1);
+  tname.textContent = next ? "Unlocks " + next.name : target.name;
+  tcost.textContent = rupees(targetCost);
+  tbar.style.width = Math.min(100, state.money / targetCost * 100) + "%";
 
   const gain = goodwillFrom(state.earned);
   mergeBtn.disabled = gain < 1;
@@ -549,6 +666,7 @@ function buy(g) {
   state.money -= cost;
   state.owned[g.id] = owned + count;
   buildLists();
+  flash(rows[g.id]);
   paint();
 }
 
@@ -558,6 +676,7 @@ function buyUpgrade(u) {
   state.bought[u.id] = true;
   buildLists();
   paint();
+  toast(u.name + " \u2014 " + u.desc.toLowerCase());
 }
 
 function hireManager(g) {
@@ -623,6 +742,9 @@ const gensEl = document.getElementById("gens");
 const upsEl = document.getElementById("ups");
 const statsEl = document.getElementById("stats");
 const toastEl = document.getElementById("toast");
+const popsEl = document.getElementById("pops");
+const stampEl = document.querySelector(".stamp");
+const tickerEl = document.getElementById("ticker");
 
 fileBtn.onclick = () => {
   const v = clickValue();
@@ -630,6 +752,8 @@ fileBtn.onclick = () => {
   state.earned += v;
   state.allTime += v;
   state.clicks++;
+  popMoney("+" + rupees(v));
+  pressStamp();
   buildLists();
   paint();
 };
@@ -647,7 +771,7 @@ for (const b of document.querySelectorAll(".modes button")) {
   };
 }
 
-const PAGE_BG = { dark: "#1b130c", light: "#d6c4a2" };
+const PAGE_BG = { dark: "#111a2e", light: "#d5e9f5" };
 function setTheme(t, persist) {
   document.documentElement.dataset.theme = t;
   document.querySelector('meta[name="theme-color"]').content = PAGE_BG[t];
@@ -671,6 +795,7 @@ setInterval(() => {
   paint();
 }, 100);
 setInterval(save, 5000);
+setInterval(chatter, 2800);
 addEventListener("visibilitychange", () => { if (document.hidden) save(); });
 addEventListener("pagehide", save);
 
