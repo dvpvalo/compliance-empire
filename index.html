@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compliance Empire</title>
+<meta name="theme-color" content="#0b0f0b">
+<meta name="color-scheme" content="light dark">
+<script>
+  (function () {
+    var t;
+    try { t = localStorage.getItem("empire-theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap">
+<style>
+  /* Light first, dark below. Swap these and the whole thing changes. */
+  :root {
+    --bg: #f2f3ee;
+    --panel: #fbfcf8;
+    --fg: #14180f;
+    --muted: #5b6355;
+    --line: #cdd2c6;
+    --accent: #176b2b;
+    --accent-fg: #ffffff;
+    --warn: #8a6300;
+    --radius: 0;
+    --font: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0f0b;
+    --panel: #0f150f;
+    --fg: #cfe8cf;
+    --muted: #8aa88e;
+    --line: #22331f;
+    --accent: #17712f;
+    --accent-fg: #ffffff;
+    --warn: #d6a017;
+  }
+  * { box-sizing: border-box; }
+  html { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font);
+    min-height: 100%; min-height: 100dvh;
+    display: flex; flex-direction: column;
+    overflow-y: auto; overscroll-behavior: none;
+  }
+  button { font-family: inherit; color: inherit; -webkit-tap-highlight-color: transparent; user-select: none; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  header h1 {
+    margin: 0; font-size: 15px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+  }
+  header .tools { display: flex; align-items: center; gap: 4px; }
+  header button {
+    background: none; border: 0; color: var(--muted);
+    font-size: 12px; letter-spacing: 1px; padding: 8px; cursor: pointer;
+  }
+  #themeBtn { font-size: 16px; }
+
+  .bank { padding: 22px 16px 18px; text-align: center; border-bottom: 1px solid var(--line); }
+  .money { font-size: clamp(30px, 9vw, 44px); font-weight: 700; line-height: 1.1; }
+  .rate { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  #fileBtn {
+    margin-top: 16px; width: 100%; max-width: 420px;
+    background: var(--accent); color: var(--accent-fg);
+    border: 1px solid var(--accent); border-radius: var(--radius);
+    padding: 16px; font-size: 15px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+  }
+  #fileBtn:active { transform: translateY(1px); }
+  #fileBtn small { display: block; margin-top: 4px; font-size: 11px; font-weight: 400; letter-spacing: 1px; opacity: .85; }
+
+  main {
+    flex-grow: 1; display: grid; gap: 1px; background: var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (min-width: 760px) { main { grid-template-columns: 1fr 1fr; } }
+  .panel { background: var(--bg); padding: 14px 16px 20px; }
+  .panel h2 {
+    margin: 0 0 10px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .modes { display: flex; gap: 4px; }
+  .modes button {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    font-size: 11px; padding: 6px 9px; cursor: pointer; letter-spacing: 0;
+  }
+  .modes button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+
+  .row {
+    display: flex; width: 100%; text-align: left; gap: 12px; align-items: center;
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 11px 12px; margin-bottom: 6px; cursor: pointer; min-height: 56px;
+  }
+  .row:disabled { cursor: default; opacity: .45; }
+  .row .grow { display: block; flex-grow: 1; min-width: 0; }
+  .row .name { display: block; font-size: 13px; font-weight: 600; }
+  .row .name b { color: var(--accent); font-weight: 700; }
+  .row .desc { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .row .num { display: block; text-align: right; flex: none; }
+  .row .cost { display: block; font-size: 13px; font-weight: 600; white-space: nowrap; }
+  .row .each { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; white-space: nowrap; }
+  .empty { font-size: 12px; color: var(--muted); padding: 6px 0; }
+
+  footer {
+    padding: 14px 16px calc(16px + env(safe-area-inset-bottom));
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between;
+  }
+  #mergeBtn {
+    background: var(--panel); border: 1px solid var(--warn); color: var(--warn);
+    border-radius: var(--radius); padding: 12px 14px; font-size: 12px;
+    font-weight: 600; letter-spacing: 1px; cursor: pointer;
+  }
+  #mergeBtn:disabled { opacity: .4; cursor: default; border-color: var(--line); color: var(--muted); }
+  footer .stats { font-size: 11px; color: var(--muted); line-height: 1.6; }
+  #wipeBtn { background: none; border: 0; color: var(--muted); font-size: 11px; cursor: pointer; padding: 8px; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    background: var(--fg); color: var(--bg); padding: 12px 16px;
+    border-radius: var(--radius); font-size: 12px; font-weight: 600;
+    opacity: 0; pointer-events: none; transition: opacity 150ms; z-index: 10; max-width: 90vw;
+  }
+  #toast.show { opacity: 1; }
+
+  dialog {
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--bg); color: var(--fg); font-family: inherit;
+    max-width: 340px; width: 90%; padding: 20px;
+  }
+  dialog::backdrop { background: rgba(0,0,0,.55); }
+  dialog h2 { margin: 0 0 12px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+  dialog p { margin: 0 0 8px; font-size: 13px; line-height: 1.5; }
+  dialog .big { font-size: 26px; font-weight: 700; color: var(--accent); }
+  dialog button {
+    margin-top: 16px; width: 100%; background: var(--accent); color: var(--accent-fg);
+    border: 0; border-radius: var(--radius); padding: 13px; font-size: 13px;
+    font-weight: 700; letter-spacing: 1px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Compliance Empire</h1>
+  <div class="tools">
+    <button id="themeBtn" type="button">&#x25d0;</button>
+    <button id="wipeBtn" type="button">Reset</button>
+  </div>
+</header>
+
+<section class="bank">
+  <div class="money" id="money">&#8377;0</div>
+  <div class="rate" id="rate">&#8377;0 per second</div>
+  <button id="fileBtn" type="button">File a return<small id="perClick">+&#8377;1</small></button>
+</section>
+
+<main>
+  <section class="panel">
+    <h2>Staff
+      <span class="modes">
+        <button type="button" data-mode="1" aria-pressed="true">&times;1</button>
+        <button type="button" data-mode="10" aria-pressed="false">&times;10</button>
+        <button type="button" data-mode="max" aria-pressed="false">Max</button>
+      </span>
+    </h2>
+    <div id="gens"></div>
+  </section>
+  <section class="panel">
+    <h2>Upgrades</h2>
+    <div id="ups"></div>
+  </section>
+</main>
+
+<footer>
+  <button id="mergeBtn" type="button">Merge with a bigger firm</button>
+  <div class="stats" id="stats"></div>
+</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="away">
+  <h2>While you were out</h2>
+  <p>The office kept filing.</p>
+  <p class="big" id="awayAmount">&#8377;0</p>
+  <p id="awayFor"></p>
+  <button id="awayBtn" type="button">Back to work</button>
+</dialog>
+
+<script>
+/* ---------------------------------------------------------------- content */
+
+const GROWTH = 1.15;
+
+const GENS = [
+  { id: "clerk",   name: "Article Clerk",       desc: "Files what you tell them to. Eventually.",  cost: 15,       rate: 0.1 },
+  { id: "para",    name: "Paralegal",           desc: "Knows which form is which.",                cost: 110,      rate: 1 },
+  { id: "cs",      name: "Company Secretary",   desc: "Signs off without reading. Mostly.",        cost: 1200,     rate: 8 },
+  { id: "branch",  name: "Branch Office",       desc: "A second address, a second rubber stamp.",  cost: 13000,    rate: 47 },
+  { id: "soft",    name: "Filing Software",     desc: "Times out less often than the portal.",     cost: 140000,   rate: 260 },
+  { id: "partner", name: "Partner",             desc: "Brings clients. Takes a cut regardless.",   cost: 2000000,  rate: 1400 },
+  { id: "cal",     name: "Compliance Calendar", desc: "Files everything before you wake up.",      cost: 33000000, rate: 7800 }
+];
+
+/* need: [what, howMany] — a generator id, or "click" for times clicked. */
+const UPGRADES = [
+  { id: "c1", name: "Two-finger typing",  desc: "Filing by hand pays double.",        cost: 120,        target: "click",   need: ["click", 15],   mult: 2 },
+  { id: "c2", name: "Keyboard shortcuts", desc: "Filing by hand pays double again.",  cost: 3000,       target: "click",   need: ["click", 100],  mult: 2 },
+  { id: "c3", name: "Pre-filled forms",   desc: "And once more, for the wrist.",      cost: 90000,      target: "click",   need: ["click", 400],  mult: 3 },
+
+  { id: "g1", name: "Standing desks",     desc: "Article clerks work twice as fast.", cost: 200,        target: "clerk",   need: ["clerk", 10],   mult: 2 },
+  { id: "g2", name: "Actual training",    desc: "Article clerks, doubled.",           cost: 4500,       target: "clerk",   need: ["clerk", 25],   mult: 2 },
+  { id: "g3", name: "A real library",     desc: "Paralegals, doubled.",               cost: 1300,       target: "para",    need: ["para", 10],    mult: 2 },
+  { id: "g4", name: "Precedent bank",     desc: "Paralegals, doubled.",               cost: 26000,      target: "para",    need: ["para", 25],    mult: 2 },
+  { id: "g5", name: "Digital signatures", desc: "Secretaries, doubled.",              cost: 14000,      target: "cs",      need: ["cs", 10],      mult: 2 },
+  { id: "g6", name: "Board calendar",     desc: "Secretaries, doubled.",              cost: 280000,     target: "cs",      need: ["cs", 25],      mult: 2 },
+  { id: "g7", name: "Courier contract",   desc: "Branch offices, doubled.",           cost: 150000,     target: "branch",  need: ["branch", 10],  mult: 2 },
+  { id: "g8", name: "Regional partner",   desc: "Branch offices, doubled.",           cost: 3000000,    target: "branch",  need: ["branch", 25],  mult: 2 },
+  { id: "g9", name: "Bulk upload",        desc: "Filing software, doubled.",          cost: 1700000,    target: "soft",    need: ["soft", 10],    mult: 2 },
+  { id: "g10", name: "Overnight batches", desc: "Filing software, doubled.",          cost: 34000000,   target: "soft",    need: ["soft", 25],    mult: 2 },
+  { id: "g11", name: "Equity for juniors", desc: "Partners, doubled.",                cost: 24000000,   target: "partner", need: ["partner", 10], mult: 2 },
+  { id: "g12", name: "Retainer model",    desc: "The calendar, doubled.",             cost: 400000000,  target: "cal",     need: ["cal", 10],     mult: 2 },
+
+  { id: "a1", name: "ISO certification",  desc: "Everything earns 50% more.",         cost: 500000,     target: "all",     need: ["cs", 20],      mult: 1.5 },
+  { id: "a2", name: "Named in the press", desc: "Everything earns double.",           cost: 60000000,   target: "all",     need: ["partner", 5],  mult: 2 }
+];
+
+/* Indian units all the way up. Arab is 10^9, and it keeps going from there. */
+const UNITS = [[1e17, "Shankh"], [1e15, "Padma"], [1e13, "Neel"], [1e11, "Kharab"],
+               [1e9, "Arab"], [1e7, "Cr"], [1e5, "L"], [1e3, "K"]];
+
+/* ------------------------------------------------------------------- maths */
+
+function fmt(n) {
+  if (!isFinite(n)) return "∞";
+  if (n >= 1e21) return n.toExponential(2);
+  if (n < 1000) return n < 100 && n % 1 !== 0 ? n.toFixed(1) : Math.floor(n).toString();
+  for (const [size, label] of UNITS) if (n >= size) return (n / size).toFixed(2) + " " + label;
+  return Math.floor(n).toString();
+}
+const rupees = n => "₹" + fmt(n);
+
+/* Cost of the next `count` of something already owned `owned` times. */
+function bulkCost(base, owned, count) {
+  return base * Math.pow(GROWTH, owned) * (Math.pow(GROWTH, count) - 1) / (GROWTH - 1);
+}
+
+/* How many more can be afforded with `money` — the inverse of bulkCost. */
+function maxAffordable(base, owned, money) {
+  const ratio = money * (GROWTH - 1) / (base * Math.pow(GROWTH, owned));
+  return Math.max(0, Math.floor(Math.log(1 + ratio) / Math.log(GROWTH) + 1e-9));
+}
+
+/* Half rate while away, and never more than eight hours of it. */
+function offlineGain(rate, seconds) {
+  if (seconds < 60) return 0;
+  return rate * Math.min(seconds, 8 * 3600) * 0.5;
+}
+
+/* Goodwill kept through a merge: the square root keeps late runs sane. */
+function goodwillFrom(earned) {
+  return Math.floor(Math.sqrt(earned / 1e8));
+}
+
+/* ------------------------------------------------------------------- state */
+
+const fresh = () => ({
+  money: 0, earned: 0, allTime: 0, clicks: 0,
+  owned: {}, bought: {}, goodwill: 0, merges: 0, last: Date.now()
+});
+let state = fresh();
+let buyMode = "1";
+let armed = null;
+
+function multFor(target) {
+  let m = 1;
+  for (const u of UPGRADES) if (state.bought[u.id] && u.target === target) m *= u.mult;
+  return m;
+}
+const prestigeMult = () => 1 + 0.02 * state.goodwill;
+const income = () => GENS.reduce((sum, g) =>
+  sum + (state.owned[g.id] || 0) * g.rate * multFor(g.id), 0) * multFor("all") * prestigeMult();
+const clickValue = () => 1 * multFor("click") * multFor("all") * prestigeMult();
+
+const unlocked = g => {
+  const i = GENS.indexOf(g);
+  return i === 0 || (state.owned[GENS[i - 1].id] || 0) > 0;
+};
+const upAvailable = u => {
+  if (state.bought[u.id]) return false;
+  const [what, n] = u.need;
+  return (what === "click" ? state.clicks : (state.owned[what] || 0)) >= n;
+};
+function wanted(g) {
+  const owned = state.owned[g.id] || 0;
+  if (buyMode === "max") return Math.max(1, maxAffordable(g.cost, owned, state.money));
+  return +buyMode;
+}
+
+/* ------------------------------------------------------------------ saving */
+
+const SAVE = "empire-save";
+function save() {
+  state.last = Date.now();
+  try { localStorage.setItem(SAVE, JSON.stringify(state)); } catch (e) {}
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(SAVE);
+    if (!raw) return 0;
+    const saved = JSON.parse(raw);
+    state = Object.assign(fresh(), saved);
+    const away = (Date.now() - (saved.last || Date.now())) / 1000;
+    const gain = offlineGain(income(), away);
+    state.money += gain;
+    state.earned += gain;
+    state.allTime += gain;
+    return gain ? { gain, away } : 0;
+  } catch (e) { return 0; }
+}
+
+/* --------------------------------------------------------------- rendering */
+
+let toastTimer;
+function toast(msg, ms = 2200) {
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), ms);
+}
+
+const rows = {};
+let shownGens = "", shownUps = "";
+
+function buildLists() {
+  const gens = GENS.filter(unlocked);
+  const ups = UPGRADES.filter(upAvailable);
+  const gKey = gens.map(g => g.id).join(),
+        uKey = ups.map(u => u.id).join();
+  if (gKey === shownGens && uKey === shownUps) return;
+  shownGens = gKey;
+  shownUps = uKey;
+
+  gensEl.innerHTML = "";
+  for (const g of gens) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "row";
+    b.innerHTML = '<span class="grow"><span class="name"></span><span class="desc"></span></span>'
+                + '<span class="num"><span class="cost"></span><span class="each"></span></span>';
+    b.querySelector(".desc").textContent = g.desc;
+    b._name = b.querySelector(".name");
+    b._cost = b.querySelector(".cost");
+    b._each = b.querySelector(".each");
+    b.onclick = () => buy(g);
+    rows[g.id] = b;
+    gensEl.appendChild(b);
+  }
+
+  upsEl.innerHTML = ups.length ? "" : '<p class="empty">Nothing yet. Keep filing.</p>';
+  for (const u of ups) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "row";
+    b.innerHTML = '<span class="grow"><span class="name"></span><span class="desc"></span></span>'
+                + '<span class="num"><span class="cost"></span></span>';
+    b.querySelector(".name").textContent = u.name;
+    b.querySelector(".desc").textContent = u.desc;
+    b.querySelector(".cost").textContent = rupees(u.cost);
+    b.onclick = () => buyUpgrade(u);
+    rows[u.id] = b;
+    upsEl.appendChild(b);
+  }
+}
+
+function paint() {
+  moneyEl.textContent = rupees(state.money);
+  rateEl.textContent = rupees(income()) + " per second";
+  perClickEl.textContent = "+" + rupees(clickValue());
+
+  for (const g of GENS) {
+    const row = rows[g.id];
+    if (!row || !unlocked(g)) continue;
+    const owned = state.owned[g.id] || 0;
+    const count = wanted(g);
+    const cost = bulkCost(g.cost, owned, count);
+    const label = g.name + (owned ? ' <b>&times;' + owned + "</b>" : "");
+    if (row._name.innerHTML !== label) row._name.innerHTML = label;
+    row._cost.textContent = rupees(cost) + (count > 1 ? " · " + count : "");
+    row._each.textContent = "+" + fmt(g.rate * multFor(g.id) * multFor("all") * prestigeMult()) + "/s each";
+    row.disabled = state.money < cost;
+  }
+  for (const u of UPGRADES) {
+    const row = rows[u.id];
+    if (row && upAvailable(u)) row.disabled = state.money < u.cost;
+  }
+
+  const gain = goodwillFrom(state.earned);
+  mergeBtn.disabled = gain < 1;
+  mergeBtn.textContent = gain < 1 ? "Merge at " + rupees(1e8) + " earned"
+    : (armed === "merge" ? "Tap again to merge" : "Merge → +" + gain + " goodwill");
+  statsEl.innerHTML = "Goodwill " + state.goodwill + " (+" + Math.round(state.goodwill * 2) + "% output)"
+    + "<br>Merges " + state.merges + " · filed by hand " + state.clicks
+    + "<br>All time " + rupees(state.allTime);
+}
+
+/* ----------------------------------------------------------------- actions */
+
+function buy(g) {
+  const owned = state.owned[g.id] || 0;
+  const count = wanted(g);
+  const cost = bulkCost(g.cost, owned, count);
+  if (state.money < cost) return;
+  state.money -= cost;
+  state.owned[g.id] = owned + count;
+  buildLists();
+  paint();
+}
+
+function buyUpgrade(u) {
+  if (state.money < u.cost) return;
+  state.money -= u.cost;
+  state.bought[u.id] = true;
+  buildLists();
+  paint();
+}
+
+function merge() {
+  const gain = goodwillFrom(state.earned);
+  if (gain < 1) return;
+  if (armed !== "merge") { armed = "merge"; paint(); return toast("Merging wipes the office. Tap again to confirm."); }
+  const keep = { goodwill: state.goodwill + gain, merges: state.merges + 1, allTime: state.allTime };
+  state = Object.assign(fresh(), keep);
+  armed = null;
+  shownGens = shownUps = "";
+  buildLists();
+  paint();
+  save();
+  toast("Merged. +" + gain + " goodwill, kept for good.");
+}
+
+function wipe() {
+  if (armed !== "wipe") { armed = "wipe"; return toast("This erases everything, goodwill included. Tap Reset again."); }
+  try { localStorage.removeItem(SAVE); } catch (e) {}
+  state = fresh();
+  armed = null;
+  shownGens = shownUps = "";
+  buildLists();
+  paint();
+  toast("Back to an empty desk.");
+}
+
+/* ------------------------------------------------------------------- wiring */
+
+const moneyEl = document.getElementById("money");
+const rateEl = document.getElementById("rate");
+const perClickEl = document.getElementById("perClick");
+const gensEl = document.getElementById("gens");
+const upsEl = document.getElementById("ups");
+const statsEl = document.getElementById("stats");
+const toastEl = document.getElementById("toast");
+
+fileBtn.onclick = () => {
+  const v = clickValue();
+  state.money += v;
+  state.earned += v;
+  state.allTime += v;
+  state.clicks++;
+  buildLists();
+  paint();
+};
+mergeBtn.onclick = merge;
+wipeBtn.onclick = wipe;
+document.addEventListener("click", e => {
+  if (armed && !e.target.closest("#mergeBtn, #wipeBtn")) { armed = null; paint(); }
+}, true);
+
+for (const b of document.querySelectorAll(".modes button")) {
+  b.onclick = () => {
+    buyMode = b.dataset.mode;
+    document.querySelectorAll(".modes button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    paint();
+  };
+}
+
+const PAGE_BG = { dark: "#0b0f0b", light: "#f2f3ee" };
+function setTheme(t, persist) {
+  document.documentElement.dataset.theme = t;
+  document.querySelector('meta[name="theme-color"]').content = PAGE_BG[t];
+  themeBtn.textContent = t === "dark" ? "◐" : "◑";
+  themeBtn.setAttribute("aria-label", t === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  if (persist) { try { localStorage.setItem("empire-theme", t); } catch (e) {} }
+}
+themeBtn.onclick = () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true);
+setTheme(document.documentElement.dataset.theme, false);
+
+let last = Date.now();
+setInterval(() => {
+  const now = Date.now();
+  const dt = Math.min((now - last) / 1000, 60);   /* a slept laptop should not pay out */
+  last = now;
+  const gain = income() * dt;
+  state.money += gain;
+  state.earned += gain;
+  state.allTime += gain;
+  paint();
+}, 100);
+setInterval(save, 5000);
+addEventListener("visibilitychange", () => { if (document.hidden) save(); });
+addEventListener("pagehide", save);
+
+/* Self-check: open index.html#test and read the console. */
+function selfCheck() {
+  const near = (a, b, name) => console.assert(Math.abs(a - b) < 0.01, name, a, b);
+  const eq = (a, b, name) => console.assert(a === b, name, a);
+  near(bulkCost(15, 0, 1), 15, "one costs base");
+  near(bulkCost(15, 0, 2), 15 + 15 * 1.15, "two is base plus base times growth");
+  near(bulkCost(15, 3, 1), 15 * Math.pow(1.15, 3), "owning three raises the next price");
+  eq(maxAffordable(15, 0, 14), 0, "cannot afford one");
+  eq(maxAffordable(15, 0, 15), 1, "exactly one");
+  eq(maxAffordable(15, 0, bulkCost(15, 0, 7)), 7, "max matches what bulk costs");
+  eq(maxAffordable(15, 0, bulkCost(15, 0, 7) - 0.01), 6, "a paisa short buys one fewer");
+  eq(offlineGain(10, 30), 0, "under a minute away pays nothing");
+  near(offlineGain(10, 3600), 10 * 3600 * 0.5, "half rate while away");
+  near(offlineGain(10, 99999), 10 * 8 * 3600 * 0.5, "capped at eight hours");
+  eq(goodwillFrom(1e8), 1, "first goodwill at ten crore");
+  eq(goodwillFrom(1e10), 10, "ten at a hundred times that");
+  eq(fmt(999), "999", "plain below a thousand");
+  eq(fmt(1234), "1.23 K", "thousands");
+  eq(fmt(1e5), "1.00 L", "lakh");
+  eq(fmt(2.5e7), "2.50 Cr", "crore");
+  eq(fmt(1e9), "1.00 Arab", "arab");
+  eq(fmt(1e13), "1.00 Neel", "neel");
+  console.log("self-check done");
+}
+
+const offline = load();
+buildLists();
+paint();
+if (offline) {
+  awayAmount.textContent = rupees(offline.gain);
+  const hrs = offline.away / 3600;
+  awayFor.textContent = hrs >= 8 ? "Eight hours' worth. That is the cap."
+    : hrs >= 1 ? "About " + Math.round(hrs) + " hour" + (Math.round(hrs) === 1 ? "" : "s") + " of it."
+    : Math.round(offline.away / 60) + " minutes of it.";
+  away.showModal();
+}
+awayBtn.onclick = () => away.close();
+if (location.hash === "#test") selfCheck();
+</script>
+</body>
+</html>
