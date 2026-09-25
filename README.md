@@ -13,7 +13,12 @@ that double them. When you have earned ₹10 Cr, **merge with a bigger firm**:
 everything resets, but you keep goodwill, and every point of goodwill is +2%
 output for good.
 
-Seven kinds of staff, eighteen upgrades. Costs climb at 1.15× each purchase,
+Once a tier is paying for itself, hire its **manager** (the AUTO tab beside
+each row, 120x the tier's base price). It buys that tier for you forever, so
+the game stops being about clicking and starts being about choosing what to
+automate next. Managers are wiped by a merge; goodwill is not.
+
+Seven kinds of staff, seven managers, eighteen upgrades. Costs climb at 1.15× each purchase,
 which is the standard curve for the genre — it is what keeps the next hire
 just out of reach.
 
@@ -37,9 +42,12 @@ goodwill formula and the number formatting.
 
 ## Change the look
 
-`:root` at the top of `index.html` holds the light values,
-`:root[data-theme="dark"]` the dark ones. Everything reads from them.
-The ◐ button in the header switches, and the choice is remembered.
+Paper on a desk: an engraved brass nameplate, the balance clipped to a slip
+with a FILED stamp, and every hire its own slip with a brass icon tab.
+
+`:root` holds the tokens, `:root[data-theme="dark"]` overrides them. Only the
+desk changes between themes — paper stays paper, brass stays brass. The ◐
+button switches, and the choice is remembered.
 
 ## Deploy
 

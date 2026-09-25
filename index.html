@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Compliance Empire</title>
-<meta name="theme-color" content="#0b0f0b">
+<meta name="theme-color" content="#1b130c">
 <meta name="color-scheme" content="light dark">
 <script>
   (function () {
@@ -15,158 +15,238 @@
   })();
 </script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Special+Elite&family=Karla:wght@400;600;700&display=swap">
 <style>
-  /* Light first, dark below. Swap these and the whole thing changes. */
+  /* Paper on a desk. Only the desk changes between themes — paper stays paper. */
   :root {
-    --bg: #f2f3ee;
-    --panel: #fbfcf8;
-    --fg: #14180f;
-    --muted: #5b6355;
-    --line: #cdd2c6;
-    --accent: #176b2b;
-    --accent-fg: #ffffff;
-    --warn: #8a6300;
-    --radius: 0;
-    --font: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+    --desk: #d6c4a2;
+    --grain: rgba(0,0,0,.06);
+    --desk-fg: #2e2519;
+    --desk-muted: #6b5d46;
+    --slip: #fbf7ec;
+    --slip-fg: #221c14;
+    --slip-muted: #6d6353;
+    --brass: #d9b03c;
+    --brass-hi: #f0cf6b;
+    --brass-lo: #a47c1c;
+    --brass-deep: #7d5d12;
+    --brass-fg: #1a1204;
+    --stamp: #b3261e;
+    --lift: rgba(70,52,28,.34);
+    --radius: 10px;
+    --display: "Bungee", "Karla", sans-serif;
+    --body: "Karla", system-ui, sans-serif;
   }
   :root[data-theme="dark"] {
-    --bg: #0b0f0b;
-    --panel: #0f150f;
-    --fg: #cfe8cf;
-    --muted: #8aa88e;
-    --line: #22331f;
-    --accent: #17712f;
-    --accent-fg: #ffffff;
-    --warn: #d6a017;
+    --desk: #1b130c;
+    --grain: rgba(0,0,0,.24);
+    --desk-fg: #f4efe2;
+    --desk-muted: #a08f74;
+    --slip: #efe7d3;
+    --lift: rgba(0,0,0,.5);
   }
   * { box-sizing: border-box; }
   html { height: 100%; }
   body {
-    margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font);
+    margin: 0; color: var(--desk-fg); font-family: var(--body);
+    background: var(--desk);
+    background-image: repeating-linear-gradient(92deg, var(--grain) 0 2px, transparent 2px 9px);
     min-height: 100%; min-height: 100dvh;
     display: flex; flex-direction: column;
     overflow-y: auto; overscroll-behavior: none;
   }
-  button { font-family: inherit; color: inherit; -webkit-tap-highlight-color: transparent; user-select: none; }
+  button { font-family: inherit; -webkit-tap-highlight-color: transparent; user-select: none; }
 
-  header {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
-    border-bottom: 1px solid var(--line);
+  /* ---- the engraved nameplate ---- */
+  header { padding: calc(12px + env(safe-area-inset-top)) 16px 0; }
+  .plate {
+    display: flex; align-items: center; gap: 11px;
+    background: linear-gradient(180deg, var(--brass-hi), var(--brass) 45%, var(--brass-lo));
+    color: var(--brass-fg); border-radius: 8px; padding: 10px 10px 10px 14px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.55) inset, 0 5px 14px var(--lift);
   }
-  header h1 {
-    margin: 0; font-size: 15px; font-weight: 700;
-    letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
-  }
-  header .tools { display: flex; align-items: center; gap: 4px; }
-  header button {
-    background: none; border: 0; color: var(--muted);
-    font-size: 12px; letter-spacing: 1px; padding: 8px; cursor: pointer;
+  .plate > svg { width: 24px; height: 24px; flex: none; }
+  .plate h1 { margin: 0; font-family: var(--display); font-size: 15px; line-height: 1.15; }
+  .plate .sub { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; opacity: .68; margin-top: 1px; }
+  .plate .grow { flex-grow: 1; min-width: 0; }
+  .plate button {
+    background: none; border: 0; color: var(--brass-fg); opacity: .74;
+    font-size: 11px; letter-spacing: 1px; padding: 9px 7px; cursor: pointer;
   }
   #themeBtn { font-size: 16px; }
 
-  .bank { padding: 22px 16px 18px; text-align: center; border-bottom: 1px solid var(--line); }
-  .money { font-size: clamp(30px, 9vw, 44px); font-weight: 700; line-height: 1.1; }
-  .rate { color: var(--muted); font-size: 13px; margin-top: 4px; }
-  #fileBtn {
-    margin-top: 16px; width: 100%; max-width: 420px;
-    background: var(--accent); color: var(--accent-fg);
-    border: 1px solid var(--accent); border-radius: var(--radius);
-    padding: 16px; font-size: 15px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+  /* ---- the balance, clipped to the desk ---- */
+  .bank { padding: 18px 16px 0; }
+  .slip {
+    position: relative; background: var(--slip); color: var(--slip-fg);
+    border-radius: 3px; padding: 16px 18px;
+    box-shadow: 0 10px 24px var(--lift);
   }
-  #fileBtn:active { transform: translateY(1px); }
-  #fileBtn small { display: block; margin-top: 4px; font-size: 11px; font-weight: 400; letter-spacing: 1px; opacity: .85; }
+  .clip {
+    position: absolute; top: -9px; left: 24px; width: 46px; height: 17px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--brass-hi), var(--brass-lo));
+    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 3px 6px var(--lift);
+  }
+  .cap { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--slip-muted); }
+  .money { font-family: var(--display); font-size: clamp(29px, 8.5vw, 38px); line-height: 1.3; margin-top: 2px; }
+  .money .cur { font-family: var(--body); font-weight: 700; font-size: .72em; margin-right: 3px; }
+  .rate { font-size: 12px; color: var(--slip-muted); }
+  .stamp {
+    position: absolute; right: 12px; top: 22px; width: 72px; height: 72px;
+    color: var(--stamp); opacity: .8; transform: rotate(-12deg);
+  }
 
-  main {
-    flex-grow: 1; display: grid; gap: 1px; background: var(--line);
-    border-bottom: 1px solid var(--line);
+  #fileBtn {
+    margin-top: 16px; width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    background: linear-gradient(180deg, var(--brass-hi), var(--brass) 50%, var(--brass-lo));
+    color: var(--brass-fg); border: 0; border-radius: var(--radius); padding: 16px;
+    font-family: var(--display); font-size: 15px; cursor: pointer;
+    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 5px 0 var(--brass-deep), 0 10px 20px var(--lift);
   }
-  @media (min-width: 760px) { main { grid-template-columns: 1fr 1fr; } }
-  .panel { background: var(--bg); padding: 14px 16px 20px; }
+  #fileBtn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 2px 0 var(--brass-deep);
+  }
+  #fileBtn svg { width: 23px; height: 23px; flex: none; }
+  #fileBtn small { font-family: var(--body); font-size: 12px; font-weight: 700; opacity: .78; }
+
+  /* ---- two stacks of paper on the desk ---- */
+  main { flex-grow: 1; display: grid; padding: 4px 16px 0; }
+  @media (min-width: 760px) { main { grid-template-columns: 1fr 1fr; gap: 24px; } }
+  .panel { padding: 14px 0 8px; }
   .panel h2 {
-    margin: 0 0 10px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--muted); display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    margin: 0 0 10px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--desk-muted); display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
   .modes { display: flex; gap: 4px; }
   .modes button {
-    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-    font-size: 11px; padding: 6px 9px; cursor: pointer; letter-spacing: 0;
+    background: var(--slip); border: 0; border-radius: 6px; color: var(--slip-muted);
+    font-size: 11px; font-weight: 700; padding: 7px 10px; cursor: pointer; letter-spacing: 0;
+    box-shadow: 0 2px 5px var(--lift);
   }
-  .modes button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .modes button[aria-pressed="true"] {
+    background: linear-gradient(180deg, var(--brass-hi), var(--brass-lo)); color: var(--brass-fg);
+  }
 
+  /* a hire and its manager sit side by side; a button inside a button works in neither */
+  .rowwrap { display: flex; gap: 6px; margin-bottom: 8px; }
   .row {
-    display: flex; width: 100%; text-align: left; gap: 12px; align-items: center;
-    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 11px 12px; margin-bottom: 6px; cursor: pointer; min-height: 56px;
+    display: flex; flex-grow: 1; min-width: 0; align-items: center; gap: 11px; text-align: left;
+    background: var(--slip); color: var(--slip-fg); border: 0; border-radius: 3px;
+    padding: 9px 11px; cursor: pointer; min-height: 58px;
+    box-shadow: 0 5px 12px var(--lift);
   }
-  .row:disabled { cursor: default; opacity: .45; }
+  .row:disabled { cursor: default; box-shadow: 0 2px 6px var(--lift); }
+  .row:disabled .chip { filter: grayscale(.6); opacity: .8; }
+  .row:disabled .name, .row:disabled .desc { opacity: .74; }
+  .row:disabled .cost { opacity: .45; }
+  .chip {
+    width: 38px; height: 38px; flex: none; border-radius: 7px;
+    background: linear-gradient(180deg, var(--brass), var(--brass-lo)); color: var(--brass-fg);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 0 rgba(255,255,255,.5) inset;
+  }
+  .chip svg { width: 21px; height: 21px; }
   .row .grow { display: block; flex-grow: 1; min-width: 0; }
-  .row .name { display: block; font-size: 13px; font-weight: 600; }
-  .row .name b { color: var(--accent); font-weight: 700; }
-  .row .desc { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .row .name { display: block; font-size: 13px; font-weight: 700; }
+  .row .name b { color: var(--brass-lo); }
+  .row .desc { display: block; font-size: 10.5px; color: var(--slip-muted); margin-top: 2px; line-height: 1.35; }
   .row .num { display: block; text-align: right; flex: none; }
-  .row .cost { display: block; font-size: 13px; font-weight: 600; white-space: nowrap; }
-  .row .each { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; white-space: nowrap; }
-  .empty { font-size: 12px; color: var(--muted); padding: 6px 0; }
+  .row .cost { display: block; font-family: var(--display); font-size: 14px; white-space: nowrap; }
+  .row .each { display: block; font-size: 10px; color: var(--slip-muted); margin-top: 3px; white-space: nowrap; }
+
+  .auto {
+    flex: none; width: 56px; border: 0; border-radius: 3px; cursor: pointer;
+    background: var(--slip); color: var(--slip-muted);
+    font-size: 9px; font-weight: 700; letter-spacing: 1px; line-height: 1.6; padding: 4px 2px;
+    box-shadow: 0 5px 12px var(--lift);
+  }
+  .auto b { display: block; font-size: 10px; }
+  .auto.on { background: linear-gradient(180deg, var(--brass-hi), var(--brass-lo)); color: var(--brass-fg); }
+  .auto:disabled { cursor: default; box-shadow: 0 2px 6px var(--lift); opacity: .8; }
+  .auto:disabled:not(.on) { color: color-mix(in srgb, var(--slip-muted) 55%, transparent); }
+  .empty { font-size: 12px; color: var(--desk-muted); padding: 4px 0 10px; }
 
   footer {
-    padding: 14px 16px calc(16px + env(safe-area-inset-bottom));
-    display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between;
+    padding: 10px 16px calc(18px + env(safe-area-inset-bottom));
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between;
   }
   #mergeBtn {
-    background: var(--panel); border: 1px solid var(--warn); color: var(--warn);
-    border-radius: var(--radius); padding: 12px 14px; font-size: 12px;
-    font-weight: 600; letter-spacing: 1px; cursor: pointer;
+    background: none; border: 1px solid var(--brass-lo); color: var(--desk-fg);
+    border-radius: var(--radius); padding: 12px 15px;
+    font-family: var(--display); font-size: 12px; cursor: pointer;
   }
-  #mergeBtn:disabled { opacity: .4; cursor: default; border-color: var(--line); color: var(--muted); }
-  footer .stats { font-size: 11px; color: var(--muted); line-height: 1.6; }
-  #wipeBtn { background: none; border: 0; color: var(--muted); font-size: 11px; cursor: pointer; padding: 8px; }
+  #mergeBtn:disabled { opacity: .45; cursor: default; border-color: var(--desk-muted); }
+  footer .stats { font-size: 10.5px; color: var(--desk-muted); line-height: 1.6; }
+  footer .stats b { color: var(--brass); }
+  #wipeBtn { background: none; border: 0; cursor: pointer; }
 
   #toast {
     position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
-    background: var(--fg); color: var(--bg); padding: 12px 16px;
-    border-radius: var(--radius); font-size: 12px; font-weight: 600;
-    opacity: 0; pointer-events: none; transition: opacity 150ms; z-index: 10; max-width: 90vw;
+    background: var(--slip-fg); color: var(--slip); padding: 12px 16px; border-radius: 6px;
+    font-size: 12px; font-weight: 700; opacity: 0; pointer-events: none;
+    transition: opacity 150ms; z-index: 10; max-width: 90vw; box-shadow: 0 8px 20px var(--lift);
   }
   #toast.show { opacity: 1; }
 
   dialog {
-    border: 1px solid var(--line); border-radius: var(--radius);
-    background: var(--bg); color: var(--fg); font-family: inherit;
-    max-width: 340px; width: 90%; padding: 20px;
+    border: 0; border-radius: 4px; background: var(--slip); color: var(--slip-fg);
+    font-family: inherit; max-width: 330px; width: 90%; padding: 22px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.55);
   }
-  dialog::backdrop { background: rgba(0,0,0,.55); }
-  dialog h2 { margin: 0 0 12px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
-  dialog p { margin: 0 0 8px; font-size: 13px; line-height: 1.5; }
-  dialog .big { font-size: 26px; font-weight: 700; color: var(--accent); }
+  dialog::backdrop { background: rgba(20,14,6,.62); }
+  dialog h2 { margin: 0 0 12px; font-family: var(--display); font-size: 15px; }
+  dialog p { margin: 0 0 8px; font-size: 13px; line-height: 1.5; color: var(--slip-muted); }
+  dialog .big { font-family: var(--display); font-size: 30px; color: var(--slip-fg); margin: 6px 0 10px; }
   dialog button {
-    margin-top: 16px; width: 100%; background: var(--accent); color: var(--accent-fg);
-    border: 0; border-radius: var(--radius); padding: 13px; font-size: 13px;
-    font-weight: 700; letter-spacing: 1px; cursor: pointer;
+    margin-top: 14px; width: 100%; border: 0; border-radius: var(--radius); padding: 14px;
+    background: linear-gradient(180deg, var(--brass-hi), var(--brass) 50%, var(--brass-lo));
+    color: var(--brass-fg); font-family: var(--display); font-size: 13px; cursor: pointer;
+    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 4px 0 var(--brass-deep);
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Compliance Empire</h1>
-  <div class="tools">
+  <div class="plate">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 20h16"></path><path d="M6 20V9l6-4 6 4v11"></path><path d="M10 20v-5h4v5"></path>
+    </svg>
+    <div class="grow">
+      <h1>Compliance Empire</h1>
+      <div class="sub">Practice &amp; Co.</div>
+    </div>
     <button id="themeBtn" type="button">&#x25d0;</button>
     <button id="wipeBtn" type="button">Reset</button>
   </div>
 </header>
 
 <section class="bank">
-  <div class="money" id="money">&#8377;0</div>
-  <div class="rate" id="rate">&#8377;0 per second</div>
-  <button id="fileBtn" type="button">File a return<small id="perClick">+&#8377;1</small></button>
+  <div class="slip">
+    <span class="clip"></span>
+    <div class="cap">Fees received</div>
+    <div class="money"><span class="cur">&#8377;</span><span id="money">0</span></div>
+    <div class="rate" id="rate">&#8377;0 per second</div>
+    <svg class="stamp" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+      <circle cx="50" cy="50" r="44"></circle>
+      <circle cx="50" cy="50" r="36" stroke-dasharray="4 3"></circle>
+      <text x="50" y="45" text-anchor="middle" font-family="Special Elite, cursive" font-size="17" fill="currentColor" stroke="none">FILED</text>
+      <text x="50" y="63" text-anchor="middle" font-family="Special Elite, cursive" font-size="10" fill="currentColor" stroke="none">CE-1</text>
+    </svg>
+  </div>
+  <button id="fileBtn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M8 3h8v5H8z"></path><path d="M6 8h12l1 5H5z"></path><path d="M4 16h16v4H4z"></path>
+    </svg>
+    <span>File a return <small id="perClick">+&#8377;1</small></span>
+  </button>
 </section>
 
 <main>
   <section class="panel">
-    <h2>Staff
+    <h2>Staff on roll
       <span class="modes">
         <button type="button" data-mode="1" aria-pressed="true">&times;1</button>
         <button type="button" data-mode="10" aria-pressed="false">&times;10</button>
@@ -211,6 +291,22 @@ const GENS = [
   { id: "cal",     name: "Compliance Calendar", desc: "Files everything before you wake up.",      cost: 33000000, rate: 7800 }
 ];
 
+/* A manager buys its tier for you, forever. Priced well past the tier itself. */
+const managerCost = g => g.cost * 120;
+
+const ICONS = {
+  clerk:   '<circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6"></path>',
+  para:    '<path d="M3 7h6l2 2.5h10V19H3z"></path><path d="M3 11h18"></path>',
+  cs:      '<circle cx="12" cy="9" r="5"></circle><path d="M9 13.6L8 21l4-2 4 2-1-7.4"></path>',
+  branch:  '<path d="M4 20h16"></path><path d="M6 20V8l6-3.5L18 8v12"></path><path d="M10 20v-5h4v5"></path>',
+  soft:    '<rect x="3" y="5" width="18" height="12" rx="1.5"></rect><path d="M9 21h6"></path><path d="M12 17v4"></path>',
+  partner: '<path d="M3 8h18v11H3z"></path><path d="M9 8V5h6v3"></path><path d="M3 13h18"></path>',
+  cal:     '<rect x="3" y="5" width="18" height="16" rx="1.5"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path>',
+  up:      '<path d="M12 19V6"></path><path d="M6 12l6-6 6 6"></path>'
+};
+const icon = key => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" '
+  + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[key] + '</svg>';
+
 /* need: [what, howMany] — a generator id, or "click" for times clicked. */
 const UPGRADES = [
   { id: "c1", name: "Two-finger typing",  desc: "Filing by hand pays double.",        cost: 120,        target: "click",   need: ["click", 15],   mult: 2 },
@@ -254,7 +350,8 @@ function bulkCost(base, owned, count) {
   return base * Math.pow(GROWTH, owned) * (Math.pow(GROWTH, count) - 1) / (GROWTH - 1);
 }
 
-/* How many more can be afforded with `money` — the inverse of bulkCost. */
+/* How many more can be afforded with `money` — the inverse of bulkCost.
+   The epsilon is for the boundary: floats land a hair under an exact price. */
 function maxAffordable(base, owned, money) {
   const ratio = money * (GROWTH - 1) / (base * Math.pow(GROWTH, owned));
   return Math.max(0, Math.floor(Math.log(1 + ratio) / Math.log(GROWTH) + 1e-9));
@@ -275,7 +372,8 @@ function goodwillFrom(earned) {
 
 const fresh = () => ({
   money: 0, earned: 0, allTime: 0, clicks: 0,
-  owned: {}, bought: {}, goodwill: 0, merges: 0, last: Date.now()
+  owned: {}, bought: {}, managers: {},
+  goodwill: 0, merges: 0, last: Date.now()
 });
 let state = fresh();
 let buyMode = "1";
@@ -331,7 +429,7 @@ function load() {
 /* --------------------------------------------------------------- rendering */
 
 let toastTimer;
-function toast(msg, ms = 2200) {
+function toast(msg, ms = 2600) {
   toastEl.textContent = msg;
   toastEl.classList.add("show");
   clearTimeout(toastTimer);
@@ -352,10 +450,14 @@ function buildLists() {
 
   gensEl.innerHTML = "";
   for (const g of gens) {
+    const wrap = document.createElement("div");
+    wrap.className = "rowwrap";
+
     const b = document.createElement("button");
     b.type = "button";
     b.className = "row";
-    b.innerHTML = '<span class="grow"><span class="name"></span><span class="desc"></span></span>'
+    b.innerHTML = '<span class="chip">' + icon(g.id) + "</span>"
+                + '<span class="grow"><span class="name"></span><span class="desc"></span></span>'
                 + '<span class="num"><span class="cost"></span><span class="each"></span></span>';
     b.querySelector(".desc").textContent = g.desc;
     b._name = b.querySelector(".name");
@@ -363,27 +465,40 @@ function buildLists() {
     b._each = b.querySelector(".each");
     b.onclick = () => buy(g);
     rows[g.id] = b;
-    gensEl.appendChild(b);
+
+    const a = document.createElement("button");
+    a.type = "button";
+    a.className = "auto";
+    a.onclick = () => hireManager(g);
+    rows[g.id + ":auto"] = a;
+
+    wrap.appendChild(b);
+    wrap.appendChild(a);
+    gensEl.appendChild(wrap);
   }
 
   upsEl.innerHTML = ups.length ? "" : '<p class="empty">Nothing yet. Keep filing.</p>';
   for (const u of ups) {
+    const wrap = document.createElement("div");
+    wrap.className = "rowwrap";
     const b = document.createElement("button");
     b.type = "button";
     b.className = "row";
-    b.innerHTML = '<span class="grow"><span class="name"></span><span class="desc"></span></span>'
+    b.innerHTML = '<span class="chip">' + icon("up") + "</span>"
+                + '<span class="grow"><span class="name"></span><span class="desc"></span></span>'
                 + '<span class="num"><span class="cost"></span></span>';
     b.querySelector(".name").textContent = u.name;
     b.querySelector(".desc").textContent = u.desc;
     b.querySelector(".cost").textContent = rupees(u.cost);
     b.onclick = () => buyUpgrade(u);
     rows[u.id] = b;
-    upsEl.appendChild(b);
+    wrap.appendChild(b);
+    upsEl.appendChild(wrap);
   }
 }
 
 function paint() {
-  moneyEl.textContent = rupees(state.money);
+  moneyEl.textContent = fmt(state.money);
   rateEl.textContent = rupees(income()) + " per second";
   perClickEl.textContent = "+" + rupees(clickValue());
 
@@ -393,11 +508,22 @@ function paint() {
     const owned = state.owned[g.id] || 0;
     const count = wanted(g);
     const cost = bulkCost(g.cost, owned, count);
-    const label = g.name + (owned ? ' <b>&times;' + owned + "</b>" : "");
+    const label = g.name + (owned ? " <b>&times;" + owned + "</b>" : "");
     if (row._name.innerHTML !== label) row._name.innerHTML = label;
     row._cost.textContent = rupees(cost) + (count > 1 ? " · " + count : "");
     row._each.textContent = "+" + fmt(g.rate * multFor(g.id) * multFor("all") * prestigeMult()) + "/s each";
     row.disabled = state.money < cost;
+
+    const auto = rows[g.id + ":auto"];
+    const hired = !!state.managers[g.id];
+    const mCost = managerCost(g);
+    const label2 = hired ? "<b>AUTO</b>on" : "<b>AUTO</b>" + rupees(mCost);
+    if (auto.innerHTML !== label2) auto.innerHTML = label2;
+    auto.classList.toggle("on", hired);
+    auto.disabled = hired || state.money < mCost;
+    auto.setAttribute("aria-label", hired
+      ? "Manager hired for " + g.name
+      : "Hire a manager for " + g.name + ", " + rupees(mCost));
   }
   for (const u of UPGRADES) {
     const row = rows[u.id];
@@ -408,7 +534,7 @@ function paint() {
   mergeBtn.disabled = gain < 1;
   mergeBtn.textContent = gain < 1 ? "Merge at " + rupees(1e8) + " earned"
     : (armed === "merge" ? "Tap again to merge" : "Merge → +" + gain + " goodwill");
-  statsEl.innerHTML = "Goodwill " + state.goodwill + " (+" + Math.round(state.goodwill * 2) + "% output)"
+  statsEl.innerHTML = "Goodwill <b>" + state.goodwill + "</b> · +" + Math.round(state.goodwill * 2) + "% output"
     + "<br>Merges " + state.merges + " · filed by hand " + state.clicks
     + "<br>All time " + rupees(state.allTime);
 }
@@ -434,10 +560,39 @@ function buyUpgrade(u) {
   paint();
 }
 
+function hireManager(g) {
+  const cost = managerCost(g);
+  if (state.managers[g.id] || state.money < cost) return;
+  state.money -= cost;
+  state.managers[g.id] = true;
+  paint();
+  save();
+  toast("A manager now hires for " + g.name + ", so you never have to.");
+}
+
+/* Managers buy one of their own tier per tick, whenever the money is there. */
+function runManagers() {
+  let bought = false;
+  for (const g of GENS) {
+    if (!state.managers[g.id]) continue;
+    const owned = state.owned[g.id] || 0;
+    const cost = bulkCost(g.cost, owned, 1);
+    if (state.money < cost) continue;
+    state.money -= cost;
+    state.owned[g.id] = owned + 1;
+    bought = true;
+  }
+  if (bought) buildLists();
+}
+
 function merge() {
   const gain = goodwillFrom(state.earned);
   if (gain < 1) return;
-  if (armed !== "merge") { armed = "merge"; paint(); return toast("Merging wipes the office. Tap again to confirm."); }
+  if (armed !== "merge") {
+    armed = "merge";
+    paint();
+    return toast("Merging wipes the office, managers included. Tap again.");
+  }
   const keep = { goodwill: state.goodwill + gain, merges: state.merges + 1, allTime: state.allTime };
   state = Object.assign(fresh(), keep);
   armed = null;
@@ -459,7 +614,7 @@ function wipe() {
   toast("Back to an empty desk.");
 }
 
-/* ------------------------------------------------------------------- wiring */
+/* ------------------------------------------------------------------ wiring */
 
 const moneyEl = document.getElementById("money");
 const rateEl = document.getElementById("rate");
@@ -492,7 +647,7 @@ for (const b of document.querySelectorAll(".modes button")) {
   };
 }
 
-const PAGE_BG = { dark: "#0b0f0b", light: "#f2f3ee" };
+const PAGE_BG = { dark: "#1b130c", light: "#d6c4a2" };
 function setTheme(t, persist) {
   document.documentElement.dataset.theme = t;
   document.querySelector('meta[name="theme-color"]').content = PAGE_BG[t];
@@ -512,6 +667,7 @@ setInterval(() => {
   state.money += gain;
   state.earned += gain;
   state.allTime += gain;
+  runManagers();
   paint();
 }, 100);
 setInterval(save, 5000);
@@ -534,6 +690,7 @@ function selfCheck() {
   near(offlineGain(10, 99999), 10 * 8 * 3600 * 0.5, "capped at eight hours");
   eq(goodwillFrom(1e8), 1, "first goodwill at ten crore");
   eq(goodwillFrom(1e10), 10, "ten at a hundred times that");
+  eq(managerCost({ cost: 15 }), 1800, "a manager costs 120 of its tier");
   eq(fmt(999), "999", "plain below a thousand");
   eq(fmt(1234), "1.23 K", "thousands");
   eq(fmt(1e5), "1.00 L", "lakh");
